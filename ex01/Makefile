@@ -7,8 +7,8 @@ all: ising3d figures
 ising3d: ising3d.cpp
 
 results: ising3d
-	./ising3d 1000000 1 0 30 > results_30.dat
-	./ising3d 1000000 1 0 60 > results_60.dat
+	./ising3d 100 1 0 10 > results_10.dat
+	./ising3d 100 1 0 20 > results_20.dat
 
 figures: results figures.gplt
 	gnuplot figures.gplt

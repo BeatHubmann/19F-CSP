@@ -2,10 +2,11 @@
 	"folders": [
 		{
 			"path": "ex01"
-		},
-		{
-			"path": "/Users/z7717/Repos/OwnRepos/18H-ICP/ex06"
 		}
 	],
-	"settings": {}
+	"settings": {
+		"files.associations": {
+			"tuple": "cpp"
+		}
+	}
 }

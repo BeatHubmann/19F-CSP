@@ -14,10 +14,10 @@ set y2range [-0.2:1.2];
 
 set y2tics
 
-plot 'results_30.dat' i 1 u 1:2 w lines title 'L=30: Energy E', \
-     'results_30.dat' i 1 u 1:3 w lines axes x1y2 title 'L=30: Magnetization M', \
-     'results_60.dat' i 1 u 1:2 w lines title 'L=60: Energy E', \
-     'results_60.dat' i 1 u 1:3 w lines axes x1y2 title 'L=60: Magnetization M';
+plot 'results_10.dat' i 1 u 1:2 w lines title 'L=10: Energy E', \
+     'results_10.dat' i 1 u 1:3 w lines axes x1y2 title 'L=10: Magnetization M', \
+     'results_20.dat' i 1 u 1:2 w lines title 'L=20: Energy E', \
+     'results_20.dat' i 1 u 1:3 w lines axes x1y2 title 'L=20: Magnetization M';
      
 set output 'figure2.eps'
 
@@ -31,10 +31,10 @@ set autoscale
 set ytics nomirror
 # set y2range [-0.2:1.2];
 
-plot 'results_30.dat' i 1 u 1:4 w lines title 'L=30: Heat Capacity C', \
-     'results_30.dat' i 1 u 1:5 w lines axes x1y2 title 'L=30: Susceptibility {/Symbol C}';
+plot 'results_10.dat' i 1 u 1:4 w lines title 'L=10: Heat Capacity C', \
+     'results_10.dat' i 1 u 1:5 w lines axes x1y2 title 'L=10: Susceptibility {/Symbol C}';
 
 set output 'figure3.eps'
  
-plot 'results_60.dat' i 1 u 1:4 w lines title 'L=60: Heat Capacity C', \
-     'results_60.dat' i 1 u 1:5 w lines axes x1y2 title 'L=60: Susceptibility {/Symbol C}';
+plot 'results_20.dat' i 1 u 1:4 w lines title 'L=20: Heat Capacity C', \
+     'results_20.dat' i 1 u 1:5 w lines axes x1y2 title 'L=20: Susceptibility {/Symbol C}';

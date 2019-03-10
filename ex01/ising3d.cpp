@@ -5,7 +5,9 @@
 #include <tuple>
 #include <algorithm>
 
-static int L;              // lattice side length
+static int L;                  // lattice side length
+static int thermalization;     // steps to reach thermal equilibrium
+static int decorrelation;      // steps btw measurements to avoid correlation
 static const double J{1.0};    // exchange coupling constant
 static const double T_c{4.51}; // critical temp for 3D Ising model
 
@@ -46,10 +48,11 @@ double GetExpDeltaE(const int s_i, const int h_i, const double exp_dE[]) // look
 
 // core Monte Carlo function:
 const std::tuple<double, double, std::vector<double>, double, double, std::vector<double>, double, double>
-RunExperiment(std::vector<int> &grid, double E, double M, const double T, const int steps, const int seed,
+RunExperiment(std::vector<int> &grid, double E, double M, const double T, const int measurements, const int seed,
               const bool cold_start = false)
 {
     const double LLL{(double)(L * L * L)}; // used multiple times for site averages
+    const double beta{1/T};
     if (cold_start)
     {
         grid.clear(); // reset grid to cold ground state
@@ -74,7 +77,7 @@ RunExperiment(std::vector<int> &grid, double E, double M, const double T, const 
     double sum_M2{0};
     double sum_E2{0};
 
-    for (auto s = 0; s < steps * 2; s++) // perform Metropolis MC steps: 1x steps for equilibrium, 1x steps for measurement
+    for (auto s = 0; s < thermalization + measurements * decorrelation; ++s) // perform Metropolis MC steps: 1x steps for equilibrium, 1x steps for measurement
     {
         const int i{choice(rd)};                          // choose site i
         const int h_i{h(grid, i)};                        // get h_i
@@ -95,7 +98,7 @@ RunExperiment(std::vector<int> &grid, double E, double M, const double T, const 
             }
         }
 
-        if (s > steps && s % 10 == 0) // start recording measurements after having obtained equilibrium; only every 10th to avoid correlation
+        if (s >= thermalization && s % decorrelation == 0) // start recording measurements after having obtained equilibrium; only every 10th to avoid correlation
         {
             sum_M += M; // update w.r.t. equilibrium average
             sum_E += E;
@@ -106,12 +109,12 @@ RunExperiment(std::vector<int> &grid, double E, double M, const double T, const 
         }
     }
 
-    double E_avg{sum_E / (double)steps * 10 / LLL};
-    double E2_avg{sum_E2 / (double)steps * 10 / LLL / LLL};
-    double M_avg{sum_M / (double)steps * 10 / LLL};
-    double M2_avg{sum_M2 / (double)steps * 10 / LLL / LLL};
-    double C{E2_avg - E_avg * E_avg};
-    double X{M2_avg - M_avg * M_avg};
+    double E_avg{sum_E / (double)measurements / LLL};
+    double E2_avg{sum_E2 / (double)measurements / LLL / LLL};
+    double M_avg{sum_M / (double)measurements / LLL};
+    double M2_avg{sum_M2 / (double)measurements / LLL / LLL};
+    double C{beta * beta * (E2_avg - E_avg * E_avg)};
+    double X{beta * (M2_avg - M_avg * M_avg)};
 
     std::cout << "lattice side length= " << L << " , J/T= " << J / T << std::endl; // progress report
     return std::make_tuple(E, // system total energy for next run
@@ -129,16 +132,18 @@ int main(int argc, char *argv[])
     if (argc < 5 || argc > 5 || argv[1] == "-h") // check command line arguments and give some help
     {
         std::cerr << "Usage: " << argv[0]
-                  << " steps(int): Max number of MC steps   seed(int): Initial RNG seed    cold_starts(0/1): Use cold starts     L(int): Lattice side length"
+                  << " steps(int): Number of measurements   seed(int): Initial RNG seed    cold_starts(0/1): Use cold starts     L(int): Lattice side length"
                   << std::endl
                   << std::endl;
         return 1;
     }
-    const int steps{atoi(argv[1])};       // max number of Monte Carlo steps
+    const int measurements{atoi(argv[1])};       // max number of Monte Carlo steps
     const int seed{atoi(argv[2])};        // initial RNG seed
     const bool cold_start{atoi(argv[3])}; // 1 =: start each T with fresh all +1 spin grid - not recommended
     L= atoi(argv[4]);                     // lattice side length
     const double LLL{(double)(L * L * L)};   // used multiple times
+    thermalization= LLL * 1000;           // set thermalization steps depending on L
+    decorrelation= LLL;                   // set decorrelation steps depending on L
 
     std::vector<double> temperatures{T_c}; // generate vector of Ts to conduct experiments for; make sure T_c is included
     for (auto t = 1.0; t < 7.1; t += 0.1)
@@ -152,7 +157,7 @@ int main(int argc, char *argv[])
     std::vector<std::tuple<double, double, std::vector<double>, double, std::vector<double>, double, double>> results{};
     for (const auto &T : temperatures)
     {
-        const auto result = RunExperiment(grid, E, M, T, steps, seed + T, cold_start); // run experiment for T
+        const auto result = RunExperiment(grid, E, M, T, measurements, seed + T, cold_start); // run experiment for T
         E = std::get<0>(result);                                                       // to feed into next T's experiment
         const auto E_avg{std::get<1>(result)};                                         // for output
         const auto E_steps{std::get<2>(result)};                                       // for output
