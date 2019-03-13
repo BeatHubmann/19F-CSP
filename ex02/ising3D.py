@@ -174,7 +174,6 @@ def main():
 
     poly = np.poly1d(np.polyfit(np.log10(L_range), np.log10(results), 1))
 
-    
     plt.figure()
     plt.plot(np.log10(L_range), np.log10(results), label='simulated data')
     plt.plot(np.linspace(0.7, 1.4, 20), poly(np.linspace(0.7, 1.4, 20)), label='linear fit: slope = {:.2f}'.format(poly[1]))
