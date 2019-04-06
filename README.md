@@ -1,5 +1,5 @@
 # 19F-CSP
-Assignments and code for the lecture 'Computational Statistical Physics', FS2019 @ ETHZ
+Assignments and code for the lecture ['Computational Statistical Physics'](http://vvz.ethz.ch/Vorlesungsverzeichnis/lerneinheit.view?lang=en&lerneinheitId=128429&semkez=2019S&ansicht=KATALOGDATEN&), FS2019 @ ETHZ
 
 ## Course synopsis
 
